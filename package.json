@@ -5,11 +5,12 @@
   "main": "./dist/bundle.js",
   "scripts": {
     "build": "webpack --mode production",
-    "build:dev": "webpack --mode development --watch"
+    "test": "cypress run",
+    "cypress": "cypress open"
   },
   "keywords": [
-    "old-school",
-    "widgets"
+    "widgets",
+    "old-school"
   ],
   "author": "Mihail Mishakin <x896321475@gmail.com>",
   "license": "BSD-3-Clause",
@@ -21,9 +22,6 @@
   "bugs": {
     "url": "https://github.com/dldevinc/data-xclass/issues"
   },
-  "dependencies": {
-    "eventemitter3": "^5.0.0"
-  },
   "devDependencies": {
     "@babel/core": "^7.21.0",
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
@@ -31,6 +29,11 @@
     "@babel/preset-env": "^7.20.2",
     "@babel/runtime": "^7.21.0",
     "babel-loader": "^9.1.2",
+    "chalk": "^5.2.0",
+    "cypress": "^12.7.0",
+    "dot-json": "^1.2.2",
+    "esbuild": "^0.17.11",
+    "eventemitter3": "^5.0.0",
     "webpack": "^5.76.0",
     "webpack-cli": "^5.0.1"
   }

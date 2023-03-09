@@ -1,5 +1,5 @@
-import { mutationEventEmitter, startObserving, stopObserving, mutateDOM } from "./mutation.js";
-import { arrayDifference, splitAndRemoveDuplicates } from "./utils.js";
+import {mutationEventEmitter, startObserving, stopObserving, mutateDOM} from "./mutation.js";
+import {arrayDifference, dispatch, removeFromArray, splitAndRemoveDuplicates} from "./utils.js";
 
 const ATTRIBUTE_NAME = "data-xclass";
 const SELECTOR = `[${ATTRIBUTE_NAME}]`;
@@ -19,6 +19,17 @@ const XClass = {
     mutateDOM,
 
     start() {
+        if (!document.body) {
+            console.warn(
+                'XClass Warning: Unable to initialize. ' +
+                'Trying to load XClass before `<body>` is available. ' +
+                'Did you forget to add `defer` in XClass\'s `<script>` tag?'
+            )
+        }
+
+        dispatch(document, "xclass:init");
+        dispatch(document, "xclass:initializing");
+
         startObserving();
 
         if (isFirstStart) {
@@ -54,6 +65,8 @@ const XClass = {
 
             this._initTree(document.documentElement);
         }
+
+        dispatch(document, "xclass:initialized");
     },
 
     stop() {
@@ -74,6 +87,11 @@ const XClass = {
 
         const onRegisterMethod = widgetObject["onRegister"];
         onRegisterMethod && onRegisterMethod.call(widgetObject, widgetObject);
+
+        dispatch(document, "xclass:registered", {
+            name: name,
+            widgetObject: widgetObject
+        });
     },
 
     /**
@@ -131,7 +149,8 @@ const XClass = {
             }
 
             this._destroyWidget(element, name);
-            attributeItems.splice(attributeItems.indexOf(name), 1);
+
+            removeFromArray(attributeItems, name);
         });
 
         mutateDOM(() => {
@@ -291,7 +310,7 @@ const XClass = {
                 });
             }
 
-            appliedWidgets.splice(appliedWidgets.indexOf(name), 1);
+            removeFromArray(appliedWidgets, name);
         });
     },
 

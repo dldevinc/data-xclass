@@ -1,7 +1,10 @@
 const path = require("path");
 
 module.exports = {
-  entry: "./src/index.js",
+  entry: {
+    bundle: "./build/module.js",
+    cdn: "./build/cdn.js"
+  },
   module: {
     rules: [
       {
@@ -21,9 +24,6 @@ module.exports = {
   output: {
     path: path.join(__dirname, "/dist"),
     publicPath: "/",
-    filename: "data-xclass.js",
-    library: "XClass",
-    libraryExport: "default",
-    libraryTarget: "umd",
+    filename: "[name].js"
   }
 };
