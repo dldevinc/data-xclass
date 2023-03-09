@@ -9,8 +9,8 @@ test({
       </script>
     `,
     callback: ({ expect }, window) => {
-        expect(window.XClass._registered.has("foo")).to.eq(true);
-        expect(window.XClass._registered.has("bar")).to.eq(false);
+        expect(window.XClass._registered.has("foo")).to.be.true;
+        expect(window.XClass._registered.has("bar")).to.be.false;
     }
 })
 

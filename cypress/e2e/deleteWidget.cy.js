@@ -1,4 +1,4 @@
-import {haveClasses, html, haveAttribute, test} from "./utils.js";
+import {haveClasses, html, haveAttribute, test, notHaveClasses} from "./utils.js";
 
 test({
     name: "can delete widget dynamically",
@@ -49,6 +49,8 @@ test({
     callback: ({ get }) => {
         get("#target").should(
             haveClasses(["red", "blue"])
+        ).should(
+            notHaveClasses(["green"])
         ).should(
             haveAttribute("data-xclass", "red-class blue-class")
         );

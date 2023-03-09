@@ -4,14 +4,16 @@ test({
     name: "can add widget dynamically",
     specName: "../spec.html",
     template: html`
-      <div id="target"></div>
+      <div id="target" data-xclass="red-class"></div>
       <script>
         const divEl = document.getElementById("target");
         XClass.addWidget(divEl, "blue-class");
       </script>
     `,
     callback: ({ get }) => {
-        get("#target").should(haveClasses(["blue"]));
+        get("#target").should(
+            haveClasses(["red", "blue"])
+        );
     }
 })
 
