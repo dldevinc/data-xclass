@@ -1,0 +1,37 @@
+{
+  "name": "data-xclass",
+  "version": "0.0.1",
+  "description": "Simplifies widget instantiation with declarative syntax via data-xclass HTML attribute",
+  "main": "./dist/bundle.js",
+  "scripts": {
+    "build": "webpack --mode production",
+    "build:dev": "webpack --mode development --watch"
+  },
+  "keywords": [
+    "old-school",
+    "widgets"
+  ],
+  "author": "Mihail Mishakin <x896321475@gmail.com>",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dldevinc/data-xclass.git"
+  },
+  "homepage": "https://github.com/dldevinc/data-xclass",
+  "bugs": {
+    "url": "https://github.com/dldevinc/data-xclass/issues"
+  },
+  "dependencies": {
+    "eventemitter3": "^5.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.21.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.21.0",
+    "@babel/preset-env": "^7.20.2",
+    "@babel/runtime": "^7.21.0",
+    "babel-loader": "^9.1.2",
+    "webpack": "^5.76.0",
+    "webpack-cli": "^5.0.1"
+  }
+}
