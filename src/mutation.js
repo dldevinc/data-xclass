@@ -15,12 +15,14 @@ let willProcessMutationQueue = false;
 function onMutate(mutations) {
     for (const mutation of mutations) {
         if (mutation.type === "childList") {
-            mutation.addedNodes.forEach(node => {
-                node.nodeType === 1 && mutationEventEmitter.emit("addNode", node);
+            mutation.addedNodes.forEach((node) => {
+                node.nodeType === 1 &&
+                    mutationEventEmitter.emit("addNode", node);
             });
 
-            mutation.removedNodes.forEach(node => {
-                node.nodeType === 1 && mutationEventEmitter.emit("removeNode", node);
+            mutation.removedNodes.forEach((node) => {
+                node.nodeType === 1 &&
+                    mutationEventEmitter.emit("removeNode", node);
             });
         }
 
@@ -30,14 +32,30 @@ function onMutate(mutations) {
             const oldValue = mutation.oldValue;
 
             if (el.hasAttribute(name) && oldValue === null) {
-                mutationEventEmitter.emit("addAttribute", el, name, el.getAttribute(name));
+                mutationEventEmitter.emit(
+                    "addAttribute",
+                    el,
+                    name,
+                    el.getAttribute(name)
+                );
             } else if (el.hasAttribute(name)) {
                 const newValue = el.getAttribute(name);
                 if (oldValue !== newValue) {
-                    mutationEventEmitter.emit("changeAttribute", el, name, oldValue, newValue);
+                    mutationEventEmitter.emit(
+                        "changeAttribute",
+                        el,
+                        name,
+                        oldValue,
+                        newValue
+                    );
                 }
             } else {
-                mutationEventEmitter.emit("removeAttribute", el, name, oldValue);
+                mutationEventEmitter.emit(
+                    "removeAttribute",
+                    el,
+                    name,
+                    oldValue
+                );
             }
         }
     }
@@ -48,7 +66,7 @@ function startObserving() {
         subtree: true,
         childList: true,
         attributes: true,
-        attributeOldValue: true
+        attributeOldValue: true,
     });
     currentlyObserving = true;
 }

@@ -1,7 +1,7 @@
 import {html, notHaveClasses, test} from "./utils.js";
 
 test({
-    name: "can to not trigger mutationObserver",
+    name: "can't trigger mutationObserver",
     specName: "../spec.html",
     template: html`
       <script>

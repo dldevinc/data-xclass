@@ -28,3 +28,13 @@ XClass.register("blue-class", {
 XClass.register("rgb-class", {
     dependencies: ["red-class", "green-class", "blue-class"]
 });
+
+
+XClass.register("body-class", {
+    init: function(element) {
+        document.body.classList.add("body-widget");
+    },
+    destroy: function(element) {
+        document.body.classList.remove("body-widget");
+    }
+});

@@ -1,5 +1,15 @@
-import {mutationEventEmitter, startObserving, stopObserving, mutateDOM} from "./mutation.js";
-import {arrayDifference, dispatch, removeFromArray, splitAndRemoveDuplicates} from "./utils.js";
+import {
+    mutationEventEmitter,
+    startObserving,
+    stopObserving,
+    mutateDOM,
+} from "./mutation.js";
+import {
+    arrayDifference,
+    dispatch,
+    removeFromArray,
+    splitAndRemoveDuplicates,
+} from "./utils.js";
 
 const ATTRIBUTE_NAME = "data-xclass";
 const SELECTOR = `[${ATTRIBUTE_NAME}]`;
@@ -21,10 +31,10 @@ const XClass = {
     start() {
         if (!document.body) {
             console.warn(
-                'XClass Warning: Unable to initialize. ' +
-                'Trying to load XClass before `<body>` is available. ' +
-                'Did you forget to add `defer` in XClass\'s `<script>` tag?'
-            )
+                "XClass Warning: Unable to initialize. " +
+                    "Trying to load XClass before `<body>` is available. " +
+                    "Did you forget to add `defer` in XClass's `<script>` tag?"
+            );
         }
 
         dispatch(document, "xclass:init");
@@ -36,8 +46,8 @@ const XClass = {
             isFirstStart = false;
 
             mutationEventEmitter
-                .on("addNode", node => this._initTree(node))
-                .on("removeNode", node => this._destroyTree(node))
+                .on("addNode", (node) => this._initTree(node))
+                .on("removeNode", (node) => this._destroyTree(node))
                 .on("addAttribute", (node, name, value) => {
                     if (name === ATTRIBUTE_NAME) {
                         const widgetsToApply = splitAndRemoveDuplicates(value);
@@ -46,11 +56,19 @@ const XClass = {
                 })
                 .on("changeAttribute", (node, name, oldValue, newValue) => {
                     if (name === ATTRIBUTE_NAME) {
-                        const oldValueItems = splitAndRemoveDuplicates(oldValue);
-                        const newValueItems = splitAndRemoveDuplicates(newValue);
+                        const oldValueItems =
+                            splitAndRemoveDuplicates(oldValue);
+                        const newValueItems =
+                            splitAndRemoveDuplicates(newValue);
 
-                        const widgetsToApply = arrayDifference(newValueItems, oldValueItems);
-                        const widgetsToRemove = arrayDifference(oldValueItems, newValueItems);
+                        const widgetsToApply = arrayDifference(
+                            newValueItems,
+                            oldValueItems
+                        );
+                        const widgetsToRemove = arrayDifference(
+                            oldValueItems,
+                            newValueItems
+                        );
 
                         this._destroyWidget(node, ...widgetsToRemove);
                         this._initWidget(node, ...widgetsToApply);
@@ -58,7 +76,8 @@ const XClass = {
                 })
                 .on("removeAttribute", (node, name, oldValue) => {
                     if (name === ATTRIBUTE_NAME) {
-                        const widgetsToRemove = splitAndRemoveDuplicates(oldValue);
+                        const widgetsToRemove =
+                            splitAndRemoveDuplicates(oldValue);
                         this._destroyWidget(node, ...widgetsToRemove);
                     }
                 });
@@ -90,7 +109,7 @@ const XClass = {
 
         dispatch(document, "xclass:registered", {
             name: name,
-            widgetObject: widgetObject
+            widgetObject: widgetObject,
         });
     },
 
@@ -114,9 +133,11 @@ const XClass = {
         const attributeValue = element.getAttribute(ATTRIBUTE_NAME) || "";
         const attributeItems = splitAndRemoveDuplicates(attributeValue);
 
-        names.forEach(name => {
+        names.forEach((name) => {
             if (this.isWidgetApplied(element, name)) {
-                console.warn(`Widget "${name}" has already been applied to this element.`);
+                console.warn(
+                    `Widget "${name}" has already been applied to this element.`
+                );
                 return;
             }
 
@@ -142,9 +163,11 @@ const XClass = {
         const attributeValue = element.getAttribute(ATTRIBUTE_NAME) || "";
         const attributeItems = splitAndRemoveDuplicates(attributeValue);
 
-        names.forEach(name => {
+        names.forEach((name) => {
             if (!this.isWidgetApplied(element, name)) {
-                console.warn(`Widget "${name}" was not applied to this element.`);
+                console.warn(
+                    `Widget "${name}" was not applied to this element.`
+                );
                 return;
             }
 
@@ -198,7 +221,12 @@ const XClass = {
      * @returns {HTMLElement|null}
      */
     find(root, name) {
-        const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null, false);
+        const walker = document.createTreeWalker(
+            root,
+            NodeFilter.SHOW_ELEMENT,
+            null,
+            false
+        );
 
         let node;
         while ((node = walker.nextNode())) {
@@ -206,6 +234,8 @@ const XClass = {
                 return node;
             }
         }
+
+        return null;
     },
 
     /**
@@ -216,7 +246,12 @@ const XClass = {
      */
     findAll(root, name) {
         const result = [];
-        const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null, false);
+        const walker = document.createTreeWalker(
+            root,
+            NodeFilter.SHOW_ELEMENT,
+            null,
+            false
+        );
 
         let node;
         while ((node = walker.nextNode())) {
@@ -255,7 +290,7 @@ const XClass = {
     _initWidget(element, ...names) {
         const appliedWidgets = this._getAppliedWidgets(element);
 
-        names.forEach(name => {
+        names.forEach((name) => {
             if (!this._registered.has(name)) {
                 console.warn(`Widget "${name}" is not registered.`);
                 return;
@@ -267,7 +302,7 @@ const XClass = {
             }
 
             if (Array.isArray(widgetObject.dependencies)) {
-                widgetObject.dependencies.forEach(depName => {
+                widgetObject.dependencies.forEach((depName) => {
                     this._initWidget(element, depName);
                 });
             }
@@ -289,7 +324,7 @@ const XClass = {
     _destroyWidget(element, ...names) {
         const appliedWidgets = this._getAppliedWidgets(element);
 
-        names.forEach(name => {
+        names.forEach((name) => {
             if (!this._registered.has(name)) {
                 console.warn(`Widget "${name}" is not registered.`);
                 return;
@@ -305,7 +340,7 @@ const XClass = {
             }
 
             if (Array.isArray(widgetObject.dependencies)) {
-                widgetObject.dependencies.forEach(depName => {
+                widgetObject.dependencies.forEach((depName) => {
                     this._destroyWidget(element, depName);
                 });
             }
@@ -348,7 +383,7 @@ const XClass = {
         if (root.nodeType === document.ELEMENT_NODE && root.matches(SELECTOR)) {
             this._applyAllFromAttribute(root);
         }
-        Array.from(root.querySelectorAll(SELECTOR)).forEach(node => {
+        Array.from(root.querySelectorAll(SELECTOR)).forEach((node) => {
             this._applyAllFromAttribute(node);
         });
     },
@@ -361,10 +396,10 @@ const XClass = {
         if (root.nodeType === document.ELEMENT_NODE && root.matches(SELECTOR)) {
             this._destroyAllFromAttribute(root);
         }
-        Array.from(root.querySelectorAll(SELECTOR)).forEach(node => {
+        Array.from(root.querySelectorAll(SELECTOR)).forEach((node) => {
             this._destroyAllFromAttribute(node);
         });
-    }
+    },
 };
 
 export default XClass;

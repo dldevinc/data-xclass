@@ -20,7 +20,7 @@ export function splitAndRemoveDuplicates(value) {
  * @param {string[]} arr2
  */
 export function arrayDifference(arr1, arr2) {
-    return arr1.filter(x => !arr2.includes(x));
+    return arr1.filter((x) => !arr2.includes(x));
 }
 
 /**
@@ -51,5 +51,5 @@ export function dispatch(el, name, detail = {}) {
             composed: true,
             cancelable: true,
         })
-    )
+    );
 }

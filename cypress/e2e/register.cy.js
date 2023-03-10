@@ -42,7 +42,7 @@ test({
         });
       </script>
     `,
-    callback: ({ get }, window) => {
+    callback: ({ get }) => {
         get("body").should(haveClasses(["foo-registered"]));
     }
 })
@@ -68,7 +68,7 @@ test({
         XClass.register("foo", widgetObject);
       </script>
     `,
-    callback: ({ get }, window) => {
+    callback: ({ get }) => {
         get("body").should(haveClasses(["foo-registered"]));
     }
 })

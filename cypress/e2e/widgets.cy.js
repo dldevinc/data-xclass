@@ -15,10 +15,13 @@ test({
     name: "can apply multiple widgets",
     specName: "../spec.html",
     template: html`
-      <div data-xclass="red-class blue-class"></div>
+      <div data-xclass="red-class blue-class body-class"></div>
     `,
     callback: ({ get }) => {
         get("div").should(haveClasses(["red", "blue"]));
+        get("body").should(
+            haveClasses(["body-widget"])
+        );
     }
 })
 
@@ -126,5 +129,43 @@ test({
     `,
     callback: ({ get }) => {
         get("div").should(notHaveClasses(["red"]));
+    }
+})
+
+test({
+    name: "can destroy the widget when the attribute is changed",
+    specName: "../spec.html",
+    template: html`
+      <div data-xclass="red-class blue-class"></div>
+      <script>
+        const divEl = document.querySelector("div");
+        divEl.setAttribute("data-xclass", "green-class");
+      </script>
+    `,
+    callback: ({ get }) => {
+        get("div").should(
+            haveClasses(["green"])
+        ).should(
+            notHaveClasses(["red", "blue"])
+        );
+    }
+})
+
+test({
+    name: "can destroy the widget when an element is removed",
+    specName: "../spec.html",
+    template: html`
+      <div id="wrapper">
+        <div data-xclass="body-class"></div>
+      </div>
+      <script>
+        const wrapper = document.getElementById("wrapper");
+        wrapper.remove();
+      </script>
+    `,
+    callback: ({ get }) => {
+        get("body").should(
+            notHaveClasses(["body-widget"])
+        );
     }
 })

@@ -34,15 +34,21 @@ export let test = function({name, specName, template, callback, expectedError}) 
 
             cy.window().then(window => {
                 // Execute all injected script tags.
-                new Promise(resolve => {
+                return new Promise((resolve, reject) => {
                     setTimeout(() => {
-                        window.evalScripts();
+                        try {
+                            window.evalScripts();
+                        } catch (e) {
+                            reject(e);
+                        }
                         resolve();
                     })
                 }).then(() => {
                     if (callback) {
                         callback(cy, window);
                     }
+                }).catch(error => {
+                    throw error
                 });
             });
         });
