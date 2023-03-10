@@ -216,7 +216,7 @@ const XClass = {
 
     /**
      * Ищет первый дочерний элемент, к которому применён указанный виджет.
-     * @param {Node} root
+     * @param {Node|Document} root
      * @param {string} name
      * @returns {HTMLElement|null}
      */
@@ -240,7 +240,7 @@ const XClass = {
 
     /**
      * Ищет все дочерние элементы, к которым применён указанный виджет.
-     * @param {Node} root
+     * @param {Node|Document} root
      * @param {string} name
      * @returns {HTMLElement[]}
      */

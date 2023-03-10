@@ -6,19 +6,22 @@ const pkg = require("./package.json");
 module.exports = {
 	input: "src/index.js",
 	plugins: [
+		resolve({
+			resolveOnly: ["eventemitter3"]
+		}),
 		commonjs(),
 		babel({ babelHelpers: 'bundled' }),
-		resolve(),
 	],
 	output: [
 		{
 			file: pkg.main,
-			format: "cjs"
+			format: "cjs",
 		},
 		{
 			name: "XClass",
 			file: "dist/umd.js",
-			format: "umd"
+			format: "umd",
+			sourcemap: true,
 		},
 	],
 }

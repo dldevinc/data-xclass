@@ -6,9 +6,33 @@ to use in the `data-xclass` attribute.
 
 ## Installation
 
+There are few options on how to include/import `data-xclass` into your project.
+
+### Install from NPM
+
+We can install XClass from NPM
+
 ```
 npm install data-xclass
 ```
+
+```js
+import XClass from "data-xclass";
+
+XClass.register(...);
+```
+
+### Use XClass from CDN
+
+If you don't want to include `data-xclass` files in your project, you may use it from CDN:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/data-xclass/dist/umd.js"></script>
+```
+
+### Download assets
+
+If you want to use `data-xclass` locally, you can directly download them from https://www.jsdelivr.com/package/npm/data-xclass
 
 ## Quick Start
 
@@ -17,172 +41,205 @@ Creating a simple widget:
 ```js
 import XClass from "data-xclass";
 
-// Регистрация виджета "red-class"
+// Register a new widget "red-class"
 XClass.register("red-class", {
-    // Инициализация виджета на DOM-элементе.
+    // Initalize the widget on the element
     init: function (element) {
         element.classList.add("red");
     },
 
-    // Освобождение ресурсов виджета.
+    // Clean up any resources when the widget is destroyed
     destroy: function (element) {
         element.classList.remove("red");
     }
 });
 ```
 
-В приведённом выше коде мы регистрируем виджет `red-class`, который будет добавлять
-класс `red` к любому DOM-элементу, для которого он будет инициализирован.
+The above code will register the `red-class` widget, which will add the `red` class 
+to any element it is applied to.
 
-Для того, чтобы инициализировать виджет на опредлённом DOM-элементе, нужно добавить 
-этому элементу атрибут `data-xclass` с именем виджета:
+To apply the widget, we add the `data-xclass` attribute to the element:
 
 ```html
-<div data-xclass="red-class">This div will have a red class</div>
+<div data-xclass="red-class">
+  This element will have the red class
+</div>
 ```
 
-> Вы можете перечислить несколько виджетов в атрибуте `data-xclass`,
-> разделяя их пробелами.
+> You can apply multiple widgets to an element by separating the widget names 
+> with a space.
 
-Чтобы инициализировать виджеты для всех элементов на странице, нужно вызвать метод
-`XClass.start()`.
+Now we need to initialize XClass:
 
 ```js
-import XClass from "data-xclass";
-
 window.addEventListener("DOMContentLoaded", () => {
     XClass.start();
 });
 ```
 
-Этот метод произведёт поиск DOM-элементов с атрибутом `data-xclass` и
-инициализирует на них соответствующие виджеты. Помимо этого, он будет
-отслеживать изменение DOM-дерева и инициализировать виджеты на новых
-DOM-элементах.
+This method will search for DOM elements with the `data-xclass` attribute and initialize 
+the appropriate widgets on them. In addition, it will track changes in the DOM tree and 
+initialize widgets on new DOM elements.
 
-Удаление виджета с DOM-элемента произойдёт при одном из четырёх событий:
-
-1. Изменение содержимого атрибута `data-xclass`.
-2. Удаление атрибута `data-xclass`.
-3. Удаление элемента из DOM-дерева.
-4. Вызов метода `Huacaya.deleteWidget(element, "red-class")`.
+> If you imported XClass into a bundle, you have to make sure you are registering 
+> any widget IN BETWEEN when you import the `XClass` global object, and when you 
+> initialize XClass by calling `XClass.start()`.
 
 ## API
 
-### Huacaya.register(name, widgetObject)
+### XClass.register(name, widgetObject)
 
-Регистрация виджета.
+Register a widget with the given name.
 
-**Параметры:**
+**Parameters**
 
--   `name` - Имя виджета.
--   `widgetObject` - Объект виджета. Он может содержать следующие свойства:
-    -   `onRegister(self)` - Функция, вызываемая при регистрации виджета.
-    -   `init(element, self)` - Функция инициализации виджета на DOM-элементе.
-    -   `destroy(element, self)` - Функция освобождения ресурсов виджета.
-    -   `dependencies` - Массив зависимостей виджета, которые должны быть
-        инициализированы до него.
+- `name`: The name of the widget.
+- `widgetObject`: The widget object to be registered. It can have the following properties:
+  - `onRegister(self)` - A method that is called when the widget is registered.
+  - `init(element, self)` - A method that is called when the widget is applied to an element.
+  - `destroy(element, self)` - A method that is called when the widget is removed from an element.
+  - `dependencies` - An array of widget names that have to be initialized before this widget.
 
-### Huacaya.start()
+### XClass.start()
 
-Запускает процесс инициализации и отслеживания изменений DOM-дерева.
-Наиболее подходящим местом для вызова этого метода является обработчик
-события `DOMContentLoaded`:
+Initialize XClass by searching for DOM elements with the `data-xclass` attribute
+and initializing the appropriate widgets on them.
 
-```js
-import XClass from "data-xclass";
+In addition, it will track changes in the DOM tree and initialize widgets on new DOM elements.
 
-window.addEventListener("DOMContentLoaded", () => {
-    Huacaya.start();
-});
-```
+### XClass.stop()
 
-### Huacaya.stop()
+Stops XClass from tracking changes in the DOM tree and initializing widgets on new DOM elements.
 
-Останавливает процесс отслеживания изменений DOM-дерева.
+### XClass.mutateDOM(callback)
 
-### Huacaya.mutateDOM(callback)
+Mutates the DOM in a safe way by temporarily disabling XClass and then re-enabling it 
+after the DOM mutation is finished.
 
-Выполняет переданную функцию с блокировкой отслеживания изменений DOM-дерева.
+**Parameters**
 
-### Huacaya.isWidgetApplied(element, name)
+- `callback`: A function that will be called with no arguments. This callback will be 
+  executed with XClass disabled and should contain the DOM mutation logic.
 
-Проверяет, применён ли виджет с указанным именем к указанному DOM-элементу.
+### XClass.isWidgetApplied(element, name)
 
-### Huacaya.addWidget(element, ...names)
+Checks if the widget with the given name is applied to the given element.
 
-Добавляет виджеты с указанными именами к указанному DOM-элементу.
+**Parameters**
 
-```js
-const button = document.querySelector("#form-button");
-Huacaya.addWidget(button, "red-class", "animated-button");
-```
+- `element`: The element to check.
+- `name`: The name of the widget to check.
 
-### Huacaya.deleteWidget(element, ...names)
+**Returns**
 
-Удаляет виджеты с указанными именами с указанного DOM-элемента.
+A boolean value indicating if the widget is applied to the given element.
 
-```js
-const button = document.querySelector("#form-button");
-Huacaya.deleteWidget(button, "animated-button");
-```
+### XClass.addWidget(element, ...names)
 
-### Huacaya.deleteAllWidgets(element)
+Adds the given widgets to the given element.
 
-Удаляет все виджеты с указанного DOM-элемента.
+**Parameters**
+
+- `element`: The element to which the widgets will be applied.
+- `names`: The names of the widgets to be applied.
 
 ```js
 const button = document.querySelector("#form-button");
-Huacaya.deleteAllWidgets(button);
+XClass.addWidget(button, "red-class", "animated-button");
 ```
 
-### Huacaya.findClosest(element, name)
+### XClass.deleteWidget(element, ...names)
 
-Ищет ближайший DOM-элемент, инициализированный виджетом с заданным именем.
+Removes the given widgets from the given element.
+
+**Parameters**
+
+- `element`: The element from which the widgets will be removed.
+- `names`: The names of the widgets to be removed.
+
+```js
+const button = document.querySelector("#form-button");
+XClass.deleteWidget(button, "animated-button");
+```
+
+### XClass.deleteAllWidgets(element)
+
+Removes all widgets from the given element.
+
+**Parameters**
+
+- `element`: The element from which all widgets will be removed.
+
+```js
+const button = document.querySelector("#form-button");
+XClass.deleteAllWidgets(button);
+```
+
+### XClass.findClosest(element, name)
+
+Finds the closest ancestor of the given element that has the given widget applied.
+
+**Parameters**
+
+- `element`: The element to start searching from.
+- `name`: The name of the widget.
+
+**Returns**
+
+The element that has the widget applied, or null if the widget is not found.
 
 ```js
 const nameField = document.querySelector("input[name=name]");
-const ajaxFormElement = Huacaya.findClosest(nameField, "ajax-form");
+const ajaxFormElement = XClass.findClosest(nameField, "ajax-form");
 ```
 
-### Huacaya.find(root, name)
+### XClass.find(root, name)
 
-Ищет в поддереве указанного DOM-элемента первый DOM-элемент, на котором
-инициализирован указанный виджет.
+Finds the first element in the given root element that has the given widget applied.
+
+**Parameters**
+
+- `root`: The element to start searching from.
+- `name`: The name of the widget.
+
+**Returns**
+
+The element that has the widget applied, or null if the widget is not found.
 
 ```js
-const redElement = Huacaya.find(document.documentElement, "red-class");
+const redElement = XClass.find(document, "red-class");
 if (redElement) {
-    Huacaya.deleteWidget(redElement, "red-class");
+    XClass.deleteWidget(redElement, "red-class");
 }
 ```
 
-### Huacaya.findAll(root, name)
+### XClass.findAll(root, name)
 
-Ищет в поддереве указанного DOM-элемента все DOM-элементы, на которых
-инициализирован указанный виджет.
+Finds all elements in the given root element that have the given widget applied.
+
+**Parameters**
+
+- `root`: The element to start searching from.
+- `name`: The name of the widget.
+
+**Returns**
+
+An array of elements that have the widget applied.
 
 ```js
-const redElements = Huacaya.findAll(document.documentElement, "red-class");
+// Delete all instances of "red-class" widget
+const redElements = XClass.findAll(document.documentElement, "red-class");
 redElements.forEach(node => {
-    Huacaya.deleteWidget(node, "red-class");
+  XClass.deleteWidget(node, "red-class");
 });
 ```
 
-## Примеры
+## Examples
 
-### Виджет для Swiper.js
+### Swiper.js widget
 
-В этом примере мы реализуем простой виджет, который будет инициализировать
-Swiper.js на указанном DOM-элементе.
-
-Для начала нам нужно установить Swiper.js:
-
-```bash
-npm install swiper
-```
-
-Теперь мы можем зарегистрировать виджет `swiper`:
+This example shows how to create a simple widget that uses [Swiper.js](https://swiperjs.com/) 
+to create a carousel:
 
 ```js
 import XClass from "data-xclass";
@@ -190,7 +247,7 @@ import Swiper, { FreeMode } from "swiper";
 
 import "swiper/css";
 
-Huacaya.register("swiper", {
+XClass.register("simple-swiper", {
     init: function (element) {
         new Swiper(element, {
             spaceBetween: parseInt(element.dataset.swiperSpaceBetween) || 10,
@@ -206,33 +263,61 @@ Huacaya.register("swiper", {
 });
 ```
 
-Теперь вы можете инициализировать экземпляр `Swiper` на любом DOM-элементе,
-указав имя виджета `swiper` в атрибуте `data-xclass`:
+We can then apply this widget to an element with the `data-xclass` attribute:
 
 ```html
-<div class="swiper" data-xclass="swiper" data-swiper-space-between="20">
+<div class="swiper" data-xclass="simple-swiper" data-swiper-space-between="10" data-swiper-slides-per-view="3">
     <div class="swiper-wrapper">
-        <!-- ... -->
+        <div class="swiper-slide">Slide 1</div>
+        <div class="swiper-slide">Slide 2</div>
+        <div class="swiper-slide">Slide 3</div>
     </div>
 </div>
 ```
 
-> Обратите внимание, что вы можете использовать data-атрибуты
-> для передачи конфигурации виджетам.
+> Note that we are passing options to the widget via the `data-` attributes.
+> This is a good practice as it allows us to configure the widget without having
+> to modify our code.
 
-### Алиас для набора виджетов
+### Widget dependencies
 
-С помощью поля `dependencies` вы можете создать алиас для набора виджетов:
+This example shows how to create a widget that depends on another widget:
 
 ```js
-Huacaya.register("rgb-class", {
-    dependencies: ["red-class", "green-class", "blue-class"]
+import XClass from "data-xclass";
+
+XClass.register("red-class", {
+    init: function (element) {
+        element.classList.add("red");
+    },
+    destroy: function (element) {
+        element.classList.remove("red");
+    }
+});
+
+XClass.register("blue-class", {
+    dependencies: ["red-class"],
+    init: function (element) {
+        element.classList.add("blue");
+    },
+    destroy: function (element) {
+        element.classList.remove("blue");
+    }
 });
 ```
 
-Теперь для того, чтобы инициализировать все три виджета на одном DOM-элементе,
-достаточно добавить одно имя в атрибут:
+In this example, the `blue-class` widget depends on the `red-class` widget. This
+means that when the `blue-class` widget is applied, the `red-class` widget will
+automatically be applied first.
+
+To apply the `blue-class` widget, we just need to set the `data-xclass` attribute:
 
 ```html
-<div data-xclass="rgb-class">This div will have a red, green and blue class</div>
+<div data-xclass="blue-class">
+  This element will have the red and blue classes
+</div>
 ```
+
+## License
+
+[MIT](https://github.com/dldevinc/data-xclass/blob/master/LICENSE)
