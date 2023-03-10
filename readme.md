@@ -27,7 +27,7 @@ XClass.register(...);
 If you don't want to include `data-xclass` files in your project, you may use it from CDN:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/data-xclass/dist/umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/data-xclass/dist/umd.min.js"></script>
 ```
 
 ### Download assets
