@@ -1,16 +1,24 @@
 # data-xclass
 
-Удобная и гибкая библиотека для разработки JS-виджетов.
-Она позволяет быстро и легко создавать и использовать виджеты, которые
-могут быть инициализированы и использованы на любых DOM-элементах.
+This is a lightweight library that is designed to make applying widgets to old-school 
+SSR applications. It works by letting you add the names of the widgets you want 
+to use in the `data-xclass` attribute.
 
-## Быстрый старт
+## Installation
+
+```
+npm install data-xclass
+```
+
+## Quick Start
+
+Creating a simple widget:
 
 ```js
-import Huacaya from "js/libs/huacaya/index.js";
+import XClass from "data-xclass";
 
 // Регистрация виджета "red-class"
-Huacaya.register("red-class", {
+XClass.register("red-class", {
     // Инициализация виджета на DOM-элементе.
     init: function (element) {
         element.classList.add("red");
@@ -23,40 +31,39 @@ Huacaya.register("red-class", {
 });
 ```
 
-В приведённом коде мы регистрируем виджет `red-class`, который будет добавлять
+В приведённом выше коде мы регистрируем виджет `red-class`, который будет добавлять
 класс `red` к любому DOM-элементу, для которого он будет инициализирован.
 
-Для того, чтобы показать `Huakaya`, что она должна инициализировать виджет
-на опредлённом DOM-элементе, нужно добавить этому элементу атрибут `data-huacaya`
-с именем виджета:
+Для того, чтобы инициализировать виджет на опредлённом DOM-элементе, нужно добавить 
+этому элементу атрибут `data-xclass` с именем виджета:
 
 ```html
-<div data-huacaya="red-class">This div will have a red class</div>
+<div data-xclass="red-class">This div will have a red class</div>
 ```
 
-> Вы можете указать имена нескольких виджетов в атрибуте `data-huacaya`,
+> Вы можете перечислить несколько виджетов в атрибуте `data-xclass`,
 > разделяя их пробелами.
 
-Чтобы `Huakaya` инициализировала виджеты на странице, нужно вызвать метод
-`Huakaya.start()`.
+Чтобы инициализировать виджеты для всех элементов на странице, нужно вызвать метод
+`XClass.start()`.
 
 ```js
-import Huacaya from "js/libs/huacaya/index.js";
+import XClass from "data-xclass";
 
 window.addEventListener("DOMContentLoaded", () => {
-    Huacaya.start();
+    XClass.start();
 });
 ```
 
-Этот метод произведёт поиск DOM-элементов с атрибутом `data-huacaya` и
+Этот метод произведёт поиск DOM-элементов с атрибутом `data-xclass` и
 инициализирует на них соответствующие виджеты. Помимо этого, он будет
 отслеживать изменение DOM-дерева и инициализировать виджеты на новых
 DOM-элементах.
 
 Удаление виджета с DOM-элемента произойдёт при одном из четырёх событий:
 
-1. Изменение содержимого атрибута `data-huacaya`.
-2. Удаление атрибута `data-huacaya`.
+1. Изменение содержимого атрибута `data-xclass`.
+2. Удаление атрибута `data-xclass`.
 3. Удаление элемента из DOM-дерева.
 4. Вызов метода `Huacaya.deleteWidget(element, "red-class")`.
 
@@ -83,7 +90,7 @@ DOM-элементах.
 события `DOMContentLoaded`:
 
 ```js
-import Huacaya from "js/libs/huacaya/index.js";
+import XClass from "data-xclass";
 
 window.addEventListener("DOMContentLoaded", () => {
     Huacaya.start();
@@ -178,7 +185,7 @@ npm install swiper
 Теперь мы можем зарегистрировать виджет `swiper`:
 
 ```js
-import Huacaya from "js/libs/huacaya/index.js";
+import XClass from "data-xclass";
 import Swiper, { FreeMode } from "swiper";
 
 import "swiper/css";
@@ -200,10 +207,10 @@ Huacaya.register("swiper", {
 ```
 
 Теперь вы можете инициализировать экземпляр `Swiper` на любом DOM-элементе,
-указав имя виджета `swiper` в атрибуте `data-huacaya`:
+указав имя виджета `swiper` в атрибуте `data-xclass`:
 
 ```html
-<div class="swiper" data-huacaya="swiper" data-swiper-space-between="20">
+<div class="swiper" data-xclass="swiper" data-swiper-space-between="20">
     <div class="swiper-wrapper">
         <!-- ... -->
     </div>
@@ -227,5 +234,5 @@ Huacaya.register("rgb-class", {
 достаточно добавить одно имя в атрибут:
 
 ```html
-<div data-huacaya="rgb-class">This div will have a red, green and blue class</div>
+<div data-xclass="rgb-class">This div will have a red, green and blue class</div>
 ```

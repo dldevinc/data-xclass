@@ -1,14 +1,18 @@
 <html lang="en">
 <head>
   <title>Tests</title>
-  <script src="/dist/cdn.js" defer></script>
+  <script src="../dist/umd.js" defer></script>
   <script src="widgets.js" defer></script>
-  <script>
+  <script defer>
     window.evalScripts = function() {
         document.body.querySelectorAll("script").forEach(el => {
             eval(el.innerHTML);
         });
     }
+
+    window.addEventListener("DOMContentLoaded", () => {
+        window.XClass.start();
+    });
   </script>
 </head>
 <body id="root">
