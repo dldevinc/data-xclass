@@ -1,7 +1,7 @@
 {
   "name": "data-xclass",
   "version": "0.0.4",
-  "description": "Simplifies widget instantiation with declarative syntax via data-xclass HTML attribute",
+  "description": "A lightweight widget library for traditional SSR apps",
   "main": "dist/cjs.js",
   "scripts": {
     "build": "rollup -c",
