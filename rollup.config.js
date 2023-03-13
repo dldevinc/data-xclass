@@ -3,14 +3,15 @@ const babel = require("@rollup/plugin-babel");
 const commonjs = require("@rollup/plugin-commonjs");
 const terser = require("@rollup/plugin-terser");
 
-module.exports = {
+module.exports = [{
 	input: "src/index.js",
+	external: ["eventemitter3"],
 	plugins: [
-		resolve({
-			resolveOnly: ["eventemitter3"]
-		}),
 		commonjs(),
-		babel({ babelHelpers: 'bundled' }),
+		babel({
+			exclude: ["node_modules/**"],
+			babelHelpers: "bundled"
+		}),
 	],
 	output: [
 		{
@@ -18,11 +19,21 @@ module.exports = {
 			format: "cjs",
 		},
 		{
-			file: "dist/cjs.min.js",
-			format: "cjs",
-			sourcemap: true,
-			plugins: [terser()]
+			file: "dist/esm.js",
+			format: "es",
 		},
+	],
+}, {
+	input: "src/index.js",
+	plugins: [
+		resolve(),
+		commonjs(),
+		babel({
+			exclude: ["node_modules/**"],
+			babelHelpers: "bundled"
+		}),
+	],
+	output: [
 		{
 			name: "XClass",
 			file: "dist/umd.js",
@@ -34,7 +45,9 @@ module.exports = {
 			file: "dist/umd.min.js",
 			format: "umd",
 			sourcemap: true,
-			plugins: [terser()]
+			plugins: [
+				terser()
+			]
 		},
 	],
-}
+}]

@@ -13,6 +13,12 @@
     "widgets",
     "old-school"
   ],
+  "exports": {
+    ".": {
+      "require": "./dist/cjs.js",
+      "import": "./dist/esm.js"
+    }
+  },
   "author": "Mihail Mishakin <x896321475@gmail.com>",
   "license": "BSD-3-Clause",
   "repository": {
