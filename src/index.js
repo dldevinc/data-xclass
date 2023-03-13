@@ -261,7 +261,7 @@ const XClass = {
 
     /**
      * Применение виджетов в поддереве элемента root.
-     * @param {HTMLElement|Document} root
+     * @param {HTMLElement|Document} [root=document.documentElement]
      */
     initTree(root = document.documentElement) {
         if (root.nodeType === document.ELEMENT_NODE && root.matches(SELECTOR)) {
@@ -274,7 +274,7 @@ const XClass = {
 
     /**
      * Удаление всех виджетов в поддереве элемента root.
-     * @param {HTMLElement|Document} root
+     * @param {HTMLElement|Document} [root=document.documentElement]
      */
     destroyTree(root = document.documentElement) {
         if (root.nodeType === document.ELEMENT_NODE && root.matches(SELECTOR)) {
