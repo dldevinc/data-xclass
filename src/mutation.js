@@ -62,6 +62,10 @@ function onMutate(mutations) {
 }
 
 function startObserving() {
+    if (currentlyObserving) {
+        return
+    }
+
     observer.observe(document, {
         subtree: true,
         childList: true,
@@ -72,6 +76,10 @@ function startObserving() {
 }
 
 function stopObserving() {
+    if (!currentlyObserving) {
+        return
+    }
+
     flushObserver();
     observer.disconnect();
     currentlyObserving = false;

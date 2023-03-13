@@ -83,7 +83,8 @@ initialize widgets on new DOM elements.
 
 > If you imported XClass into a bundle, you have to make sure you are registering 
 > any widget IN BETWEEN when you import the `XClass` global object, and when you 
-> initialize XClass by calling `XClass.start()`.
+> initialize XClass by calling `XClass.start()`. Otherwise, you will have to call
+> `XClass.initTree()` to manually initialize the widgets.
 
 ## API
 
@@ -233,6 +234,22 @@ redElements.forEach(node => {
   XClass.deleteWidget(node, "red-class");
 });
 ```
+
+### XClass.initTree(root = document.documentElement)
+
+Initalizes all widgets in the given root element.
+
+**Parameters**
+
+- `root`: The root element to start searching from. Defaults to `document.documentElement`.
+
+### XClass.destroyTree(root = document.documentElement)
+
+Destroys all widgets in the given root element.
+
+**Parameters**
+
+- `root`: The root element to start searching from. Defaults to `document.documentElement`.
 
 ## Examples
 

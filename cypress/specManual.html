@@ -1,0 +1,17 @@
+<html lang="en">
+<head>
+  <title>Tests</title>
+  <script src="../dist/umd.js" defer></script>
+  <script src="widgets.js" defer></script>
+  <script defer>
+    window.evalScripts = function() {
+        document.body.querySelectorAll("script").forEach(el => {
+            eval(el.innerHTML);
+        });
+    }
+  </script>
+</head>
+<body id="root">
+
+</body>
+</html>

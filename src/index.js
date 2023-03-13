@@ -37,17 +37,14 @@ const XClass = {
             );
         }
 
-        dispatch(document, "xclass:init");
-        dispatch(document, "xclass:initializing");
-
         startObserving();
 
         if (isFirstStart) {
             isFirstStart = false;
 
             mutationEventEmitter
-                .on("addNode", (node) => this._initTree(node))
-                .on("removeNode", (node) => this._destroyTree(node))
+                .on("addNode", (node) => this.initTree(node))
+                .on("removeNode", (node) => this.destroyTree(node))
                 .on("addAttribute", (node, name, value) => {
                     if (name === ATTRIBUTE_NAME) {
                         const widgetsToApply = splitAndRemoveDuplicates(value);
@@ -82,7 +79,7 @@ const XClass = {
                     }
                 });
 
-            this._initTree(document.documentElement);
+            this.initTree();
         }
 
         dispatch(document, "xclass:initialized");
@@ -262,6 +259,32 @@ const XClass = {
         return result;
     },
 
+    /**
+     * Применение виджетов в поддереве элемента root.
+     * @param {HTMLElement|Document} root
+     */
+    initTree(root = document.documentElement) {
+        if (root.nodeType === document.ELEMENT_NODE && root.matches(SELECTOR)) {
+            this._applyAllFromAttribute(root);
+        }
+        Array.from(root.querySelectorAll(SELECTOR)).forEach((node) => {
+            this._applyAllFromAttribute(node);
+        });
+    },
+
+    /**
+     * Удаление всех виджетов в поддереве элемента root.
+     * @param {HTMLElement|Document} root
+     */
+    destroyTree(root = document.documentElement) {
+        if (root.nodeType === document.ELEMENT_NODE && root.matches(SELECTOR)) {
+            this._destroyAllFromAttribute(root);
+        }
+        Array.from(root.querySelectorAll(SELECTOR)).forEach((node) => {
+            this._destroyAllFromAttribute(node);
+        });
+    },
+
     // =================================================================================
     //   Private methods
     // =================================================================================
@@ -373,32 +396,6 @@ const XClass = {
         const attributeValue = element.getAttribute(ATTRIBUTE_NAME) || "";
         const widgetsToRemove = splitAndRemoveDuplicates(attributeValue);
         this._destroyWidget(element, ...widgetsToRemove);
-    },
-
-    /**
-     * Применение виджетов для каждого DOM-элемента в поддереве элемента root.
-     * @param {HTMLElement|Document} root
-     */
-    _initTree(root) {
-        if (root.nodeType === document.ELEMENT_NODE && root.matches(SELECTOR)) {
-            this._applyAllFromAttribute(root);
-        }
-        Array.from(root.querySelectorAll(SELECTOR)).forEach((node) => {
-            this._applyAllFromAttribute(node);
-        });
-    },
-
-    /**
-     * Удаление всех виджетов для каждого DOM-элемента в поддереве элемента root.
-     * @param {HTMLElement|Document} root
-     */
-    _destroyTree(root) {
-        if (root.nodeType === document.ELEMENT_NODE && root.matches(SELECTOR)) {
-            this._destroyAllFromAttribute(root);
-        }
-        Array.from(root.querySelectorAll(SELECTOR)).forEach((node) => {
-            this._destroyAllFromAttribute(node);
-        });
     },
 };
 
