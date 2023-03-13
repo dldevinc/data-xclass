@@ -315,7 +315,7 @@ const XClass = {
 
         names.forEach((name) => {
             if (!this._registered.has(name)) {
-                console.warn(`Widget "${name}" is not registered.`);
+                console.debug(`Widget "${name}" is not registered.`);
                 return;
             }
 
@@ -349,7 +349,7 @@ const XClass = {
 
         names.forEach((name) => {
             if (!this._registered.has(name)) {
-                console.warn(`Widget "${name}" is not registered.`);
+                console.debug(`Widget "${name}" is not registered.`);
                 return;
             }
 
