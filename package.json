@@ -1,6 +1,6 @@
 {
   "name": "data-xclass",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A lightweight widget library for traditional SSR apps",
   "main": "dist/cjs.js",
   "scripts": {
