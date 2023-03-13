@@ -318,6 +318,26 @@ To apply the `blue-class` widget, we just need to set the `data-xclass` attribut
 </div>
 ```
 
+### Alias for a set of widgets
+
+Sometimes we want to apply multiple widgets to an element with a single command.
+We can do this by creating an alias for a set of widgets:
+
+```js
+// Create an alias for the red-class and blue-class widgets
+XClass.register("red-blue-classes", {
+    dependencies: ["red-class", "blue-class"]
+});
+```
+
+Now we can apply both the `red-class` and `blue-class` widgets with a single command:
+
+```html
+<div data-xclass="red-blue-classes">
+  This element will have the red and blue classes
+</div>
+```
+
 ## License
 
 [MIT](https://github.com/dldevinc/data-xclass/blob/master/LICENSE)
