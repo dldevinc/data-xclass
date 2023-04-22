@@ -15,14 +15,13 @@ let willProcessMutationQueue = false;
 function onMutate(mutations) {
     for (const mutation of mutations) {
         if (mutation.type === "childList") {
-            mutation.addedNodes.forEach((node) => {
-                node.nodeType === 1 &&
-                    mutationEventEmitter.emit("addNode", node);
-            });
-
             mutation.removedNodes.forEach((node) => {
                 node.nodeType === 1 &&
                     mutationEventEmitter.emit("removeNode", node);
+            });
+            mutation.addedNodes.forEach((node) => {
+                node.nodeType === 1 &&
+                    mutationEventEmitter.emit("addNode", node);
             });
         }
 
@@ -31,14 +30,21 @@ function onMutate(mutations) {
             const name = mutation.attributeName;
             const oldValue = mutation.oldValue;
 
-            if (el.hasAttribute(name) && oldValue === null) {
+            if (!el.hasAttribute(name)) {
+                mutationEventEmitter.emit(
+                    "removeAttribute",
+                    el,
+                    name,
+                    oldValue
+                );
+            } else if (oldValue === null) {
                 mutationEventEmitter.emit(
                     "addAttribute",
                     el,
                     name,
                     el.getAttribute(name)
                 );
-            } else if (el.hasAttribute(name)) {
+            } else {
                 const newValue = el.getAttribute(name);
                 if (oldValue !== newValue) {
                     mutationEventEmitter.emit(
@@ -49,13 +55,6 @@ function onMutate(mutations) {
                         newValue
                     );
                 }
-            } else {
-                mutationEventEmitter.emit(
-                    "removeAttribute",
-                    el,
-                    name,
-                    oldValue
-                );
             }
         }
     }
