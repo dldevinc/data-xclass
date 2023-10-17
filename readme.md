@@ -260,13 +260,15 @@ to create a carousel:
 
 ```js
 import XClass from "data-xclass";
-import Swiper, { FreeMode } from "swiper";
+import Swiper from "swiper";
+import { FreeMode } from "swiper/modules";
 
 import "swiper/css";
 
 XClass.register("simple-swiper", {
     init: function (element) {
         new Swiper(element, {
+            modules: [FreeMode],
             spaceBetween: parseInt(element.dataset.swiperSpaceBetween) || 10,
             slidesPerView: parseInt(element.dataset.swiperSlidesPerView) || "auto"
         });
