@@ -334,6 +334,11 @@ const XClass = {
                 widgetObject.init(element, widgetObject);
             }
             appliedWidgets.push(name);
+
+            dispatch(element, "xclass:init-widget", {
+                name: name,
+                widgetObject: widgetObject,
+            })
         });
     },
 
@@ -369,6 +374,11 @@ const XClass = {
             }
 
             removeFromArray(appliedWidgets, name);
+
+            dispatch(element, "xclass:destroy-widget", {
+                name: name,
+                widgetObject: widgetObject,
+            })
         });
     },
 
