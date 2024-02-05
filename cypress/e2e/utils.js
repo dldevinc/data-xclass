@@ -15,6 +15,7 @@ export let test = function({name, specName, template, callback, expectedError}) 
     it(name, () => {
         cy.visit(`${__dirname}/${specName}`, {
             onBeforeLoad(win) {
+                cy.stub(win.console, "log").as("consoleLog");
                 cy.stub(win.console, "warn").as("consoleWarn");
                 cy.stub(win.console, "error").as("consoleError");
             }

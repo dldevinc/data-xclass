@@ -330,15 +330,25 @@ const XClass = {
                 });
             }
 
+            let initResult = null;
             if (widgetObject.init) {
-                widgetObject.init(element, widgetObject);
+                initResult = widgetObject.init(element, widgetObject);
             }
             appliedWidgets.push(name);
 
-            dispatch(element, "xclass:init-widget", {
-                name: name,
-                widgetObject: widgetObject,
-            });
+            if (initResult instanceof Promise) {
+                initResult.then(() => {
+                    dispatch(element, "xclass:init-widget", {
+                        name: name,
+                        widgetObject: widgetObject,
+                    });
+                });
+            } else {
+                dispatch(element, "xclass:init-widget", {
+                    name: name,
+                    widgetObject: widgetObject,
+                });
+            }
         });
     },
 
@@ -363,22 +373,32 @@ const XClass = {
                 return;
             }
 
+            let destroyResult = null;
             if (widgetObject.destroy) {
-                widgetObject.destroy(element, widgetObject);
+                destroyResult = widgetObject.destroy(element, widgetObject);
             }
 
             if (Array.isArray(widgetObject.dependencies)) {
-                widgetObject.dependencies.forEach((depName) => {
+                widgetObject.dependencies.reverse().forEach((depName) => {
                     this._destroyWidget(element, depName);
                 });
             }
 
             removeFromArray(appliedWidgets, name);
 
-            dispatch(element, "xclass:destroy-widget", {
-                name: name,
-                widgetObject: widgetObject,
-            });
+            if (destroyResult instanceof Promise) {
+                destroyResult.then(() => {
+                    dispatch(element, "xclass:destroy-widget", {
+                        name: name,
+                        widgetObject: widgetObject,
+                    });
+                });
+            } else {
+                dispatch(element, "xclass:destroy-widget", {
+                    name: name,
+                    widgetObject: widgetObject,
+                });
+            }
         });
     },
 
