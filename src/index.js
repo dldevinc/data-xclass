@@ -33,7 +33,7 @@ const XClass = {
             console.warn(
                 "XClass Warning: Unable to initialize. " +
                     "Trying to load XClass before `<body>` is available. " +
-                    "Did you forget to add `defer` in XClass's `<script>` tag?"
+                    "Did you forget to add `defer` in XClass's `<script>` tag?",
             );
         }
 
@@ -60,11 +60,11 @@ const XClass = {
 
                         const widgetsToApply = arrayDifference(
                             newValueItems,
-                            oldValueItems
+                            oldValueItems,
                         );
                         const widgetsToRemove = arrayDifference(
                             oldValueItems,
-                            newValueItems
+                            newValueItems,
                         );
 
                         this._destroyWidget(node, ...widgetsToRemove);
@@ -133,7 +133,7 @@ const XClass = {
         names.forEach((name) => {
             if (this.isWidgetApplied(element, name)) {
                 console.warn(
-                    `Widget "${name}" has already been applied to this element.`
+                    `Widget "${name}" has already been applied to this element.`,
                 );
                 return;
             }
@@ -163,7 +163,7 @@ const XClass = {
         names.forEach((name) => {
             if (!this.isWidgetApplied(element, name)) {
                 console.warn(
-                    `Widget "${name}" was not applied to this element.`
+                    `Widget "${name}" was not applied to this element.`,
                 );
                 return;
             }
@@ -222,7 +222,7 @@ const XClass = {
             root,
             NodeFilter.SHOW_ELEMENT,
             null,
-            false
+            false,
         );
 
         let node;
@@ -247,7 +247,7 @@ const XClass = {
             root,
             NodeFilter.SHOW_ELEMENT,
             null,
-            false
+            false,
         );
 
         let node;
@@ -338,7 +338,7 @@ const XClass = {
             dispatch(element, "xclass:init-widget", {
                 name: name,
                 widgetObject: widgetObject,
-            })
+            });
         });
     },
 
@@ -378,7 +378,7 @@ const XClass = {
             dispatch(element, "xclass:destroy-widget", {
                 name: name,
                 widgetObject: widgetObject,
-            })
+            });
         });
     },
 

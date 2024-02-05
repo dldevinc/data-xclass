@@ -35,14 +35,14 @@ function onMutate(mutations) {
                     "removeAttribute",
                     el,
                     name,
-                    oldValue
+                    oldValue,
                 );
             } else if (oldValue === null) {
                 mutationEventEmitter.emit(
                     "addAttribute",
                     el,
                     name,
-                    el.getAttribute(name)
+                    el.getAttribute(name),
                 );
             } else {
                 const newValue = el.getAttribute(name);
@@ -52,7 +52,7 @@ function onMutate(mutations) {
                         el,
                         name,
                         oldValue,
-                        newValue
+                        newValue,
                     );
                 }
             }
@@ -62,7 +62,7 @@ function onMutate(mutations) {
 
 function startObserving() {
     if (currentlyObserving) {
-        return
+        return;
     }
 
     observer.observe(document, {
@@ -76,7 +76,7 @@ function startObserving() {
 
 function stopObserving() {
     if (!currentlyObserving) {
-        return
+        return;
     }
 
     flushObserver();
