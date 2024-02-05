@@ -43,21 +43,18 @@ const XClass = {
             isFirstStart = false;
 
             mutationEventEmitter
-                .on("addNode", (node) => this.initTree(node))
-                .on("removeNode", (node) => this.destroyTree(node))
-                .on("addAttribute", (node, name, value) => {
+                .on("addNode", async (node) => await this.initTree(node))
+                .on("removeNode", async (node) => await this.destroyTree(node))
+                .on("addAttribute", async (node, name, value) => {
                     if (name === ATTRIBUTE_NAME) {
                         const widgetsToApply = splitAndRemoveDuplicates(value);
-                        this._initWidget(node, ...widgetsToApply);
+                        await this._initWidget(node, ...widgetsToApply);
                     }
                 })
-                .on("changeAttribute", (node, name, oldValue, newValue) => {
+                .on("changeAttribute", async (node, name, oldValue, newValue) => {
                     if (name === ATTRIBUTE_NAME) {
-                        const oldValueItems =
-                            splitAndRemoveDuplicates(oldValue);
-                        const newValueItems =
-                            splitAndRemoveDuplicates(newValue);
-
+                        const oldValueItems = splitAndRemoveDuplicates(oldValue);
+                        const newValueItems = splitAndRemoveDuplicates(newValue);
                         const widgetsToApply = arrayDifference(
                             newValueItems,
                             oldValueItems,
@@ -67,22 +64,22 @@ const XClass = {
                             newValueItems,
                         );
 
-                        this._destroyWidget(node, ...widgetsToRemove);
-                        this._initWidget(node, ...widgetsToApply);
+                        await this._destroyWidget(node, ...widgetsToRemove);
+                        await this._initWidget(node, ...widgetsToApply);
                     }
                 })
-                .on("removeAttribute", (node, name, oldValue) => {
+                .on("removeAttribute", async (node, name, oldValue) => {
                     if (name === ATTRIBUTE_NAME) {
-                        const widgetsToRemove =
-                            splitAndRemoveDuplicates(oldValue);
-                        this._destroyWidget(node, ...widgetsToRemove);
+                        const widgetsToRemove = splitAndRemoveDuplicates(oldValue);
+                        await this._destroyWidget(node, ...widgetsToRemove);
                     }
                 });
 
-            this.initTree();
+            this.initTree()
+            .then(() => {
+                dispatch(document, "xclass:initialized");
+            });
         }
-
-        dispatch(document, "xclass:initialized");
     },
 
     stop() {
@@ -130,24 +127,26 @@ const XClass = {
         const attributeValue = element.getAttribute(ATTRIBUTE_NAME) || "";
         const attributeItems = splitAndRemoveDuplicates(attributeValue);
 
-        names.forEach((name) => {
+        const promises = names.map((name) => {
             if (this.isWidgetApplied(element, name)) {
                 console.warn(
                     `Widget "${name}" has already been applied to this element.`,
                 );
-                return;
+                return Promise.resolve();
             }
 
-            this._initWidget(element, name);
             attributeItems.push(name);
+            return this._initWidget(element, name);
         });
 
-        mutateDOM(() => {
-            if (attributeItems.length) {
-                element.setAttribute(ATTRIBUTE_NAME, attributeItems.join(" "));
-            } else {
-                element.removeAttribute(ATTRIBUTE_NAME);
-            }
+        Promise.allSettled(promises).then(() => {
+            mutateDOM(() => {
+                if (attributeItems.length) {
+                    element.setAttribute(ATTRIBUTE_NAME, attributeItems.join(" "));
+                } else {
+                    element.removeAttribute(ATTRIBUTE_NAME);
+                }
+            });
         });
     },
 
@@ -160,25 +159,26 @@ const XClass = {
         const attributeValue = element.getAttribute(ATTRIBUTE_NAME) || "";
         const attributeItems = splitAndRemoveDuplicates(attributeValue);
 
-        names.forEach((name) => {
+        const promises = names.map((name) => {
             if (!this.isWidgetApplied(element, name)) {
                 console.warn(
                     `Widget "${name}" was not applied to this element.`,
                 );
-                return;
+                return Promise.resolve();
             }
-
-            this._destroyWidget(element, name);
 
             removeFromArray(attributeItems, name);
+            return this._destroyWidget(element, name);
         });
 
-        mutateDOM(() => {
-            if (attributeItems.length) {
-                element.setAttribute(ATTRIBUTE_NAME, attributeItems.join(" "));
-            } else {
-                element.removeAttribute(ATTRIBUTE_NAME);
-            }
+        Promise.allSettled(promises).then(() => {
+            mutateDOM(() => {
+                if (attributeItems.length) {
+                    element.setAttribute(ATTRIBUTE_NAME, attributeItems.join(" "));
+                } else {
+                    element.removeAttribute(ATTRIBUTE_NAME);
+                }
+            });
         });
     },
 
@@ -187,10 +187,11 @@ const XClass = {
      * @param {HTMLElement} element
      */
     deleteAllWidgets(element) {
-        this._destroyAllFromAttribute(element);
-
-        mutateDOM(() => {
-            element.removeAttribute(ATTRIBUTE_NAME);
+        this._destroyAllFromAttribute(element)
+        .then(() => {
+            mutateDOM(() => {
+                element.removeAttribute(ATTRIBUTE_NAME);
+            });
         });
     },
 
@@ -262,27 +263,33 @@ const XClass = {
     /**
      * Применение виджетов в поддереве элемента root.
      * @param {HTMLElement|Document} [root=document.documentElement]
+     * @return {Promise}
      */
-    initTree(root = document.documentElement) {
+    async initTree(root = document.documentElement) {
         if (root.nodeType === document.ELEMENT_NODE && root.matches(SELECTOR)) {
-            this._applyAllFromAttribute(root);
+            await this._applyAllFromAttribute(root);
         }
-        Array.from(root.querySelectorAll(SELECTOR)).forEach((node) => {
-            this._applyAllFromAttribute(node);
+
+        const promises = Array.from(root.querySelectorAll(SELECTOR)).map((node) => {
+            return this._applyAllFromAttribute(node);
         });
+        await Promise.allSettled(promises);
     },
 
     /**
      * Удаление всех виджетов в поддереве элемента root.
      * @param {HTMLElement|Document} [root=document.documentElement]
+     * @return {Promise}
      */
-    destroyTree(root = document.documentElement) {
+    async destroyTree(root = document.documentElement) {
         if (root.nodeType === document.ELEMENT_NODE && root.matches(SELECTOR)) {
-            this._destroyAllFromAttribute(root);
+            await this._destroyAllFromAttribute(root);
         }
-        Array.from(root.querySelectorAll(SELECTOR)).forEach((node) => {
-            this._destroyAllFromAttribute(node);
+
+        const promises = Array.from(root.querySelectorAll(SELECTOR)).map((node) => {
+            return this._destroyAllFromAttribute(node);
         });
+        await Promise.allSettled(promises);
     },
 
     // =================================================================================
@@ -308,11 +315,13 @@ const XClass = {
      * Если виджет не зарегистрирован или уже применён - он пропускается.
      * @param {HTMLElement} element
      * @param {string} names
+     * @return {Promise}
      * @private
      */
     _initWidget(element, ...names) {
         const appliedWidgets = this._getAppliedWidgets(element);
 
+        const promises = [];
         names.forEach((name) => {
             if (!this._registered.has(name)) {
                 console.debug(`Widget "${name}" is not registered.`);
@@ -326,23 +335,25 @@ const XClass = {
 
             if (Array.isArray(widgetObject.dependencies)) {
                 widgetObject.dependencies.forEach((depName) => {
-                    this._initWidget(element, depName);
+                    promises.push(this._initWidget(element, depName));
                 });
             }
 
-            let initResult = null;
+            let initResult;
             if (widgetObject.init) {
                 initResult = widgetObject.init(element, widgetObject);
             }
             appliedWidgets.push(name);
 
             if (initResult instanceof Promise) {
-                initResult.then(() => {
-                    dispatch(element, "xclass:init-widget", {
-                        name: name,
-                        widgetObject: widgetObject,
-                    });
-                });
+                promises.push(
+                    initResult.then(() => {
+                        dispatch(element, "xclass:init-widget", {
+                            name: name,
+                            widgetObject: widgetObject,
+                        });
+                    })
+                );
             } else {
                 dispatch(element, "xclass:init-widget", {
                     name: name,
@@ -350,6 +361,8 @@ const XClass = {
                 });
             }
         });
+
+        return Promise.allSettled(promises);
     },
 
     /**
@@ -357,11 +370,13 @@ const XClass = {
      * Если виджет не зарегистрирован или не применён - он пропускается.
      * @param {HTMLElement} element
      * @param {string} names
+     * @return {Promise}
      * @private
      */
     _destroyWidget(element, ...names) {
         const appliedWidgets = this._getAppliedWidgets(element);
 
+        const promises = [];
         names.forEach((name) => {
             if (!this._registered.has(name)) {
                 console.debug(`Widget "${name}" is not registered.`);
@@ -373,33 +388,37 @@ const XClass = {
                 return;
             }
 
-            let destroyResult = null;
+            let destroyResult;
             if (widgetObject.destroy) {
                 destroyResult = widgetObject.destroy(element, widgetObject);
-            }
-
-            if (Array.isArray(widgetObject.dependencies)) {
-                widgetObject.dependencies.reverse().forEach((depName) => {
-                    this._destroyWidget(element, depName);
-                });
             }
 
             removeFromArray(appliedWidgets, name);
 
             if (destroyResult instanceof Promise) {
-                destroyResult.then(() => {
-                    dispatch(element, "xclass:destroy-widget", {
-                        name: name,
-                        widgetObject: widgetObject,
-                    });
-                });
+                promises.push(
+                    destroyResult.then(() => {
+                        dispatch(element, "xclass:destroy-widget", {
+                            name: name,
+                            widgetObject: widgetObject,
+                        });
+                    })
+                );
             } else {
                 dispatch(element, "xclass:destroy-widget", {
                     name: name,
                     widgetObject: widgetObject,
                 });
             }
+
+            if (Array.isArray(widgetObject.dependencies)) {
+                widgetObject.dependencies.reverse().forEach((depName) => {
+                    promises.push(this._destroyWidget(element, depName));
+                });
+            }
         });
+
+        return Promise.allSettled(promises);
     },
 
     /**
@@ -407,12 +426,13 @@ const XClass = {
      * Поскольку _initWidget пропускает виджеты, которые уже применены,
      * данный метод является идемпотентным.
      * @param {HTMLElement} element
+     * @return {Promise}
      * @private
      */
-    _applyAllFromAttribute(element) {
+    async _applyAllFromAttribute(element) {
         const attributeValue = element.getAttribute(ATTRIBUTE_NAME) || "";
         const widgetsToApply = splitAndRemoveDuplicates(attributeValue);
-        this._initWidget(element, ...widgetsToApply);
+        await this._initWidget(element, ...widgetsToApply);
     },
 
     /**
@@ -420,12 +440,13 @@ const XClass = {
      * Поскольку _destroyWidget пропускает виджеты, которые не применены,
      * данный метод является идемпотентным.
      * @param {HTMLElement} element
+     * @return {Promise}
      * @private
      */
-    _destroyAllFromAttribute(element) {
+    async _destroyAllFromAttribute(element) {
         const attributeValue = element.getAttribute(ATTRIBUTE_NAME) || "";
         const widgetsToRemove = splitAndRemoveDuplicates(attributeValue);
-        this._destroyWidget(element, ...widgetsToRemove);
+        await this._destroyWidget(element, ...widgetsToRemove);
     },
 };
 
